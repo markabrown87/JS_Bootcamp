@@ -21,9 +21,12 @@ const defaultToDos = [
     }
 ];
 
-function loadToDos() {
+let loadedToDos;
+
+function loadToDos(todos) {
+    loadedToDos = todos;
     let list = document.getElementById('todos');
-    defaultToDos.forEach(todo => {
+    todos.forEach(todo => {
         let el = document.createElement('li');
         el.textContent = todo.text;
         el.style.color = todo.completed ? 'rgb(50,200,50)' : 'black';
@@ -56,7 +59,19 @@ function loadInput() {
     input.type = 'text';
     input.style.display = 'block';
     input.style.marginLeft = '10px';
+    input.style.marginTop = '10px';
     document.body.appendChild(input);
+}
+
+function loadSearch() {
+    let search = document.createElement('input');
+    search.id = 'search-todo';
+    search.placeholder = 'Search For Todos';
+    search.type = 'text';
+    search.style.display = 'block';
+    search.style.marginLeft = '10px';
+    search.addEventListener('input', filterToDos);
+    document.body.appendChild(search);
 }
 
 function addToDo(e) {
@@ -72,6 +87,22 @@ function addToDo(e) {
     el.style.color = 'black';
     list.appendChild(el);
     document.getElementById('new-todo').value = '';
+    loadedToDos.push({ text: text, completed: false});
+}
+
+function filterToDos(e) {
+    let searchText = e.target.value;
+    let filteredToDos = searchText ? loadedToDos.filter(todo => todo.text.includes(searchText)) : loadedToDos;
+
+    document.querySelector('ul').innerHTML = '';
+
+    filteredToDos.forEach(todo => {
+        let el = document.createElement('li');
+        el.textContent = todo.text;
+        el.style.color = todo.completed ? 'rgb(50,200,50)' : 'black';
+        el.style.textDecoration = todo.completed ? 'line-through' : null;
+        document.querySelector('ul').appendChild(el);
+    })
 }
 
 function displayInvalidInput(message) {
@@ -79,6 +110,7 @@ function displayInvalidInput(message) {
     return null;
 }
 
-loadToDos();
+loadToDos(defaultToDos);
+loadSearch();
 loadInput();
 loadSubmitButton();

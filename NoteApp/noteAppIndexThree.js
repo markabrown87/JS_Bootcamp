@@ -23,6 +23,10 @@ const defaultToDos = [
 
 let loadedToDos = defaultToDos;
 let filteredToDos = loadedToDos;
+const filterConditions = {
+    searchText: '',
+    removeCompleted: false
+}
 
 function renderToDos(todos) {
     let list = document.getElementById('todos');
@@ -36,18 +40,32 @@ function renderToDos(todos) {
     });
 }
 
+function filterToDos(todos) {
+    toDosFilteredBySearch = filterConditions.searchText ? todos.filter(todo => todo.text.includes(filterConditions.searchText)) : todos;
+    toDosFilteredByCompletion = filterConditions.removeCompleted ? toDosFilteredBySearch.filter(todo => !todo.completed) : toDosFilteredBySearch;
+    return toDosFilteredByCompletion;
+}
+
 document.querySelector('#submit-todo-form').addEventListener('submit', (e) => {
     e.preventDefault();
     let text = e.target.elements.note.value;
-    loadedToDos.push({ text: text, completed: false });
+    let alreadyCompleted = e.target.elements['select-if-completed'].checked;
+    if (!text) throw new ReferenceError();
+    loadedToDos.push({ text: text, completed: alreadyCompleted });
     e.target.elements.note.value = '';
+    e.target.elements['select-if-completed'].checked = false;
     renderToDos(filteredToDos);
 });
 
 document.querySelector('#search-todo').addEventListener('input', (e) => {
-    document.querySelector('ul').innerHTML = '';
-    let searchText = e.target.value;
-    filteredToDos = searchText ? loadedToDos.filter(todo => todo.text.includes(searchText)) : loadedToDos;
+    filterConditions.searchText = e.target.value;
+    filteredToDos = filterToDos(loadedToDos);
+    renderToDos(filteredToDos);
+});
+
+document.querySelector('#hide-completed-checkbox').addEventListener('change', (e) => {
+    filterConditions.removeCompleted = !filterConditions.removeCompleted;
+    filteredToDos = filterToDos(loadedToDos);
     renderToDos(filteredToDos);
 });
 

@@ -6,6 +6,21 @@
     <body>
         <h1>Notes Application</h1>
         <ul id="todos"></ul>
+        <form id="submit-todo-form">
+            <div style="display: block;">
+                <input id="search-todo" type="text" placeholder="Search Note" style="margin-left: 10px; margin-bottom: 10px;" />
+                <label>
+                    <input id="hide-completed-checkbox" type="checkbox" name="hide-if-completed" style="margin-left: 10px;"/> Hide if already completed
+                </label>
+            </div>
+            <div>
+                <input id="submit-todo" type="text" placeholder="Submit Note" name="note" style="margin-left: 10px; margin-bottom: 10px;"/>
+                <label>
+                    <input id="completed-checkbox" type="checkbox" name="select-if-completed" style="margin-left: 10px;"/> Select if already completed
+                </label>
+            </div>
+            <button style="height: 25px; width: 100px; margin-left: 10px;">Submit</button>
+        </form>
     </body>
-    <script src="noteAppIndex.js"></script>
+    <script src="noteAppIndexThree.js"></script>
 </html>
