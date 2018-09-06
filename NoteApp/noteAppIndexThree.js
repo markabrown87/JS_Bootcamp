@@ -21,17 +21,22 @@ const defaultToDos = [
     }
 ];
 
-let loadedToDos = defaultToDos;
-let filteredToDos = loadedToDos;
+let loadedToDos = defaultToDos.slice(0, defaultToDos.length);
+
 const filterConditions = {
     searchText: '',
     removeCompleted: false
 }
+const sortConditions = {
+    activeSort: 'no-sort'
+}
 
 function renderToDos(todos) {
+    let filteredToDos = filterToDos(todos);
+    let sortedToDos = sortToDos(filteredToDos, sortConditions.activeSort);
     let list = document.getElementById('todos');
     list.innerHTML = '';
-    todos.forEach(todo => {
+    sortedToDos.forEach(todo => {
         let el = document.createElement('li');
         el.textContent = todo.text;
         el.style.color = todo.completed ? 'rgb(50,200,50)' : 'black';
@@ -41,9 +46,41 @@ function renderToDos(todos) {
 }
 
 function filterToDos(todos) {
-    toDosFilteredBySearch = filterConditions.searchText ? todos.filter(todo => todo.text.includes(filterConditions.searchText)) : todos;
+    let todosToFilter = todos.slice(0, todos.length);
+    toDosFilteredBySearch = filterConditions.searchText ? todosToFilter.filter(todo => todo.text.includes(filterConditions.searchText)) : todosToFilter;
     toDosFilteredByCompletion = filterConditions.removeCompleted ? toDosFilteredBySearch.filter(todo => !todo.completed) : toDosFilteredBySearch;
     return toDosFilteredByCompletion;
+}
+
+function sortToDos(todos, sortMethod) {
+    let todosToSort = todos.slice(0, todos.length);
+    switch(sortMethod) {
+        case 'sort-alphabetically':
+            console.log('sort-alphabetically')
+            return sortToDosAlphabetically(todosToSort)
+        default:
+            console.log('default')
+            return todosToSort;
+    }
+}
+
+function sortToDosAlphabetically(todos) {
+
+    function compareStrings(a,b) {
+        let aLowered = a.toLowerCase();
+        let bLowered = b.toLowerCase();
+        for (let i = 0; i < (Math.min(a.length, b.length)); i++) {
+            if (aLowered.charCodeAt(i) > bLowered.charCodeAt(i)) return 1;
+            if (aLowered.charCodeAt(i) < bLowered.charCodeAt(i)) return -1;
+        }
+        if (a.length === b.length) return 0;
+        return a.length < b.length ? -1 : 1;
+    }
+
+    return todos.sort((a,b) => {
+        return compareStrings(a.text, b.text);
+    });
+
 }
 
 document.querySelector('#submit-todo-form').addEventListener('submit', (e) => {
@@ -54,7 +91,7 @@ document.querySelector('#submit-todo-form').addEventListener('submit', (e) => {
     loadedToDos.push({ text: text, completed: alreadyCompleted });
     e.target.elements.note.value = '';
     e.target.elements['select-if-completed'].checked = false;
-    renderToDos(filteredToDos);
+    renderToDos(loadedToDos);
 });
 
 document.querySelector('#search-todo').addEventListener('input', (e) => {
@@ -65,8 +102,12 @@ document.querySelector('#search-todo').addEventListener('input', (e) => {
 
 document.querySelector('#hide-completed-checkbox').addEventListener('change', (e) => {
     filterConditions.removeCompleted = !filterConditions.removeCompleted;
-    filteredToDos = filterToDos(loadedToDos);
-    renderToDos(filteredToDos);
+    renderToDos(loadedToDos);
+});
+
+document.querySelector('#sort-dropdown').addEventListener('change', (e) => {
+    sortConditions.activeSort = e.target.value;
+    renderToDos(loadedToDos);
 });
 
 function displayInvalidInput(message) {
